@@ -1,0 +1,52 @@
+---
+// Toggles between name-brand and generic naming/pricing across the site.
+// Persists to localStorage and updates document.documentElement.dataset.brand.
+---
+<div class="inline-flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-brown-warm font-display">
+  <span class="hidden sm:inline">Naming Convention:</span>
+  <div
+    class="flex border-2 border-brown-deep bg-cream-light"
+    role="group"
+    aria-label="Brand naming preference"
+  >
+    <button
+      type="button"
+      data-brand-set="name"
+      class="brand-btn px-3 py-1.5 transition-colors data-[active=true]:bg-brown-deep data-[active=true]:text-cream-light"
+      aria-label="Use name-brand: Tater Tots"
+    >
+      Tater Tots&reg;
+    </button>
+    <button
+      type="button"
+      data-brand-set="generic"
+      class="brand-btn px-3 py-1.5 border-l-2 border-brown-deep transition-colors data-[active=true]:bg-brown-deep data-[active=true]:text-cream-light"
+      aria-label="Use generic: Taters Seasoned Shredded Potatoes"
+    >
+      Generic
+    </button>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    const KEY = "tti.brand";
+    const root = document.documentElement;
+    function apply(brand) {
+      root.dataset.brand = brand;
+      document.querySelectorAll("[data-brand-set]").forEach((btn) => {
+        btn.dataset.active = String(btn.dataset.brandSet === brand);
+      });
+      window.dispatchEvent(new CustomEvent("brandchange", { detail: { brand } }));
+    }
+    const initial = root.dataset.brand || "name";
+    apply(initial);
+    document.querySelectorAll("[data-brand-set]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const next = btn.dataset.brandSet;
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        apply(next);
+      });
+    });
+  })();
+</script>

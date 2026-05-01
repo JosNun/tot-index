@@ -1,0 +1,305 @@
+---
+import Layout from "../layouts/Layout.astro";
+import BrandName from "../components/BrandName.astro";
+import {
+  PRICE_PER_TOT,
+  PRICE_PER_OUNCE,
+  TOT_WEIGHT_GRAMS,
+} from "../data/constants";
+
+const presets = [
+  { label: "A Latte", value: 6.5 },
+  { label: "Tank of Gas", value: 65 },
+  { label: "iPhone", value: 999 },
+  { label: "Used Sedan", value: 18000 },
+  { label: "Wedding", value: 35000 },
+  { label: "Family Home", value: 450000 },
+  { label: "Powerball Jackpot", value: 100_000_000 },
+];
+---
+<Layout title="Tater Tot Index | Calculator">
+  <section class="mx-auto max-w-4xl px-6 py-16">
+    <div class="text-center mb-12">
+      <div class="font-display uppercase tracking-[0.4em] text-xs text-rust mb-3">
+        The Council's Official
+      </div>
+      <h1 class="font-display font-bold uppercase text-5xl sm:text-6xl letterpress">
+        Conversion Calculator
+      </h1>
+      <p class="font-serif italic text-lg text-brown-warm mt-4 max-w-2xl mx-auto">
+        Submit any sum &mdash; in U.S. dollars &mdash; for evaluation in the proper unit.
+        The Council's calculator returns crisped cylinders, weight, and volumetric
+        coverage.
+      </p>
+    </div>
+
+    <div class="card-bordered p-6 sm:p-10">
+      <label class="block">
+        <div class="font-display uppercase tracking-[0.2em] text-xs text-brown-warm mb-2">
+          Enter an Amount in U.S. Dollars
+        </div>
+        <div class="flex items-center border-2 border-brown-deep bg-cream-light">
+          <span class="px-4 font-stat text-3xl text-brown-warm">$</span>
+          <input
+            id="calc-input"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="0.01"
+            value="450000"
+            class="input-paper border-0 flex-1 px-2 py-4 text-3xl tabular w-full focus:outline-none"
+            aria-label="Dollar amount"
+          />
+        </div>
+      </label>
+
+      <div class="mt-4">
+        <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm mb-2">
+          Or select a preset
+        </div>
+        <div class="flex flex-wrap gap-2">
+          {presets.map((p) => (
+            <button
+              type="button"
+              data-preset={p.value}
+              class="preset-btn bg-cream-light hover:bg-gold/40 text-brown-deep border-2 border-brown-deep font-display uppercase tracking-[0.15em] text-[11px] px-3 py-2 transition-colors"
+            >
+              {p.label}
+              <span class="text-brown-warm/70 ml-1 normal-case font-serif italic">${p.value.toLocaleString()}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="rule-ornate my-10">
+        <span class="font-display uppercase tracking-[0.3em] text-[10px]">The Verdict</span>
+      </div>
+
+      <div class="text-center">
+        <div class="font-display uppercase tracking-[0.2em] text-xs text-brown-warm">
+          That sum, denominated in <BrandName />:
+        </div>
+        <div class="my-4">
+          <div id="calc-tots" class="font-stat text-rust-deep tabular leading-none text-6xl sm:text-7xl">&mdash;</div>
+          <div class="font-display uppercase tracking-[0.2em] text-xs text-brown-warm mt-3">
+            crisped, golden cylinders
+          </div>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-3 gap-4 mt-10">
+        <div class="border-2 border-brown-deep bg-cream-light p-4 text-center">
+          <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
+            Total Weight
+          </div>
+          <div id="calc-weight" class="font-stat text-2xl tabular mt-1 text-brown-deep">&mdash;</div>
+        </div>
+        <div class="border-2 border-brown-deep bg-cream-light p-4 text-center">
+          <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
+            Total Volume
+          </div>
+          <div id="calc-volume" class="font-stat text-2xl tabular mt-1 text-brown-deep">&mdash;</div>
+        </div>
+        <div class="border-2 border-brown-deep bg-cream-light p-4 text-center">
+          <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
+            End-to-End Length
+          </div>
+          <div id="calc-length" class="font-stat text-2xl tabular mt-1 text-brown-deep">&mdash;</div>
+        </div>
+      </div>
+
+      <div class="mt-10 border-2 border-brown-deep bg-paper p-6">
+        <div class="font-display uppercase tracking-[0.2em] text-xs text-rust mb-2">
+          Spatial Visualization
+        </div>
+        <p id="calc-spatial" class="font-serif italic text-lg text-brown-deep leading-snug">
+          &mdash;
+        </p>
+      </div>
+
+      <div class="mt-6 grid sm:grid-cols-3 gap-4">
+        <div class="border-2 border-brown-deep p-4">
+          <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
+            Buries a 2,000 sq. ft. home
+          </div>
+          <div id="calc-house" class="font-stat text-xl tabular text-brown-deep mt-1">&mdash;</div>
+        </div>
+        <div class="border-2 border-brown-deep p-4">
+          <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
+            Floods a standard pool
+          </div>
+          <div id="calc-pool" class="font-stat text-xl tabular text-brown-deep mt-1">&mdash;</div>
+        </div>
+        <div class="border-2 border-brown-deep p-4 bg-brown-deep text-cream-light">
+          <div class="font-display uppercase tracking-[0.18em] text-[10px] text-gold">
+            End-to-end, to the moon
+          </div>
+          <div id="calc-moon" class="font-stat text-xl tabular text-cream-light mt-1">&mdash;</div>
+        </div>
+      </div>
+
+      <div class="mt-6 border-2 border-brown-deep bg-cream-light p-4 text-center font-serif text-sm text-brown-warm leading-snug">
+        <span class="font-display uppercase tracking-[0.2em] text-[10px] text-rust block mb-1">
+          Lunar Reference
+        </span>
+        A bridge of <span class="brand-name">Tater Tots</span><span class="brand-generic">Taters</span>
+        laid end-to-end from the Earth to the Moon would require
+        <strong class="font-stat text-brown-deep">15.4 billion</strong> units &mdash;
+        a one-time outlay of approximately
+        <strong class="font-stat text-rust-deep brand-name">$647 million</strong><strong
+          class="font-stat text-rust-deep brand-generic">$429 million</strong>,
+        not including freight.
+      </div>
+
+      <div class="mt-10 text-center font-serif italic text-sm text-brown-warm">
+        Computed at the prevailing retail price of
+        <span class="brand-name">${PRICE_PER_OUNCE.name.toFixed(2)}/oz (Tater Tots&reg;)</span><span
+          class="brand-generic">${PRICE_PER_OUNCE.generic.toFixed(3)}/oz (generic)</span>,
+        with each tot standardized to {TOT_WEIGHT_GRAMS}g.
+      </div>
+    </div>
+  </section>
+
+  <script
+    is:inline
+    define:vars={{
+      PRICE_PER_TOT,
+      TOT_WEIGHT_GRAMS,
+    }}
+  >
+    (function () {
+      const input = document.getElementById("calc-input");
+      const elTots = document.getElementById("calc-tots");
+      const elWeight = document.getElementById("calc-weight");
+      const elVolume = document.getElementById("calc-volume");
+      const elLength = document.getElementById("calc-length");
+      const elSpatial = document.getElementById("calc-spatial");
+      const elHouse = document.getElementById("calc-house");
+      const elPool = document.getElementById("calc-pool");
+      const elMoon = document.getElementById("calc-moon");
+
+      const MOON_DISTANCE_M = 384_400_000;
+
+      function fmtTots(n) {
+        if (!isFinite(n) || n < 0) return "—";
+        if (n < 10) return n.toFixed(1);
+        if (n < 1_000_000) return Math.round(n).toLocaleString("en-US");
+        if (n < 1_000_000_000) {
+          const m = n / 1_000_000;
+          return (m >= 100 ? Math.round(m) : m.toFixed(m >= 10 ? 1 : 2)) + " million";
+        }
+        if (n < 1_000_000_000_000) {
+          const b = n / 1_000_000_000;
+          return (b >= 100 ? Math.round(b) : b.toFixed(b >= 10 ? 1 : 2)) + " billion";
+        }
+        return (n / 1_000_000_000_000).toFixed(2) + " trillion";
+      }
+
+      function fmtWeight(grams) {
+        const lbs = grams / 453.592;
+        if (lbs < 1) return (lbs * 16).toFixed(1) + " oz";
+        if (lbs < 2000) return lbs.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " lbs";
+        const tons = lbs / 2000;
+        if (tons < 1000) return tons.toLocaleString("en-US", { maximumFractionDigits: tons < 100 ? 1 : 0 }) + " tons";
+        return (tons / 1000).toFixed(1) + "K tons";
+      }
+
+      function fmtVolumeCuFt(cf) {
+        if (cf < 1) return (cf * 1728).toFixed(1) + " cu. in.";
+        if (cf < 10000) return cf.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " cu. ft.";
+        return Math.round(cf).toLocaleString("en-US") + " cu. ft.";
+      }
+
+      function fmtLength(meters) {
+        if (meters < 1) return (meters * 100).toFixed(1) + " cm";
+        if (meters < 1000) return meters.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " m";
+        const km = meters / 1000;
+        const miles = km * 0.621371;
+        return km.toLocaleString("en-US", { maximumFractionDigits: 0 }) + " km (" +
+               miles.toLocaleString("en-US", { maximumFractionDigits: 0 }) + " miles)";
+      }
+
+      function fmtDepth(feet) {
+        if (feet < 1 / 12) return (feet * 12).toFixed(2) + " inches deep";
+        if (feet < 1) return (feet * 12).toFixed(1) + " inches deep";
+        if (feet < 100) return feet.toFixed(1) + " feet deep";
+        return Math.round(feet).toLocaleString("en-US") + " feet deep";
+      }
+
+      function spatialBlurb(tots, cuFt) {
+        if (tots <= 0) return "—";
+        if (tots < 50) return "A modest snack — fits comfortably in the palm of one hand.";
+        if (tots < 500) return "Enough to fill a coffee cup, with a generous dusting of seasoning.";
+        if (tots < 5_000) return "A heaping plate, properly garnished, served at the temperature of immediate consumption.";
+        if (tots < 50_000) return "Tots filling a five-gallon bucket several times over — share generously with the household.";
+        if (tots < 500_000) return "An entire kitchen pantry, packed wall-to-wall, with the tots overflowing into the hallway.";
+        if (tots < 5_000_000) return "Tots burying the family vehicle in the driveway — the neighbors will inquire.";
+        if (tots < 50_000_000) return "An entire suburban lot transformed into a glittering field of crisped cylinders.";
+        if (tots < 500_000_000) return "Tots numbering a small city's population, stacked in the town square.";
+        if (tots < 5_000_000_000) return "A literal mountain of tots, visible from passing aircraft.";
+        return "Tots in such quantity that the Council recommends consulting a logistics professional.";
+      }
+
+      function update() {
+        const dollars = parseFloat(input.value);
+        if (!isFinite(dollars) || dollars < 0) {
+          elTots.textContent = "—";
+          elWeight.textContent = "—";
+          elVolume.textContent = "—";
+          elLength.textContent = "—";
+          elSpatial.textContent = "—";
+          elHouse.textContent = "—";
+          elPool.textContent = "—";
+          elMoon.textContent = "—";
+          return;
+        }
+        const brand = document.documentElement.dataset.brand === "generic" ? "generic" : "name";
+        const pricePerTot = PRICE_PER_TOT[brand];
+        const tots = dollars / pricePerTot;
+        const grams = tots * TOT_WEIGHT_GRAMS;
+        const cuFt = (tots * 10) / 28316.85;          // 10 ml/tot
+        const lengthMeters = tots * 0.025;             // 25mm/tot
+        const houseDepth = cuFt / 2000;                // 2,000 sq ft footprint
+        const poolFraction = cuFt / 2560;              // 16x32x5 ft pool
+
+        elTots.textContent = fmtTots(tots);
+        elWeight.textContent = fmtWeight(grams);
+        elVolume.textContent = fmtVolumeCuFt(cuFt);
+        elLength.textContent = fmtLength(lengthMeters);
+        elSpatial.textContent = spatialBlurb(tots, cuFt);
+        elHouse.textContent = fmtDepth(houseDepth);
+        elPool.textContent =
+          poolFraction < 1
+            ? Math.round(poolFraction * 100) + "% of the pool"
+            : poolFraction < 10
+              ? poolFraction.toFixed(1) + "× the pool's volume"
+              : Math.round(poolFraction).toLocaleString("en-US") + "× the pool's volume";
+
+        const moonFraction = lengthMeters / MOON_DISTANCE_M;
+        if (moonFraction < 0.00001) {
+          elMoon.textContent = (moonFraction * 100).toFixed(5) + "% of the way";
+        } else if (moonFraction < 0.0001) {
+          elMoon.textContent = (moonFraction * 100).toFixed(4) + "% of the way";
+        } else if (moonFraction < 0.01) {
+          elMoon.textContent = (moonFraction * 100).toFixed(3) + "% of the way";
+        } else if (moonFraction < 1) {
+          elMoon.textContent = (moonFraction * 100).toFixed(2) + "% of the way";
+        } else if (moonFraction < 10) {
+          elMoon.textContent = moonFraction.toFixed(2) + "× the lunar distance";
+        } else {
+          elMoon.textContent = Math.round(moonFraction).toLocaleString("en-US") + "× the lunar distance";
+        }
+      }
+
+      input.addEventListener("input", update);
+      window.addEventListener("brandchange", update);
+      document.querySelectorAll("[data-preset]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          input.value = btn.dataset.preset;
+          update();
+        });
+      });
+      update();
+    })();
+  </script>
+</Layout>

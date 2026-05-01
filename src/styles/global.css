@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #f3e7c9;
+  --color-cream-light: #faf3e0;
+  --color-paper: #ede0bf;
+  --color-brown-deep: #2a1a10;
+  --color-brown-warm: #5b3a21;
+  --color-brown-mid: #7a4f2c;
+  --color-gold: #d4a437;
+  --color-gold-deep: #b88a1f;
+  --color-rust: #b5421c;
+  --color-rust-deep: #8c2d10;
+  --color-olive: #6b7036;
+  --color-sage: #a89968;
+
+  --font-display: "Oswald", "Arial Narrow", sans-serif;
+  --font-serif: "Lora", Georgia, serif;
+  --font-body: "Lora", Georgia, serif;
+  --font-stat: "DM Serif Display", "Georgia", serif;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-cream);
+    color: var(--color-brown-deep);
+    font-family: var(--font-body);
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(212, 164, 55, 0.06) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(181, 66, 28, 0.05) 0%, transparent 40%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.10 0 0 0 0 0.06 0 0 0 0.18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: 0.02em;
+    color: var(--color-brown-deep);
+  }
+
+  ::selection {
+    background-color: var(--color-gold);
+    color: var(--color-brown-deep);
+  }
+}
+
+[data-brand="name"] .brand-generic,
+[data-brand="generic"] .brand-name {
+  display: none;
+}
+
+.rule-ornate {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-brown-warm);
+}
+.rule-ornate::before,
+.rule-ornate::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  background-image: linear-gradient(
+    to right,
+    transparent 0%,
+    currentColor 20%,
+    currentColor 80%,
+    transparent 100%
+  );
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.seal-ring {
+  background:
+    radial-gradient(circle at center, var(--color-cream-light) 56%, transparent 57%),
+    repeating-conic-gradient(
+      var(--color-brown-deep) 0deg 6deg,
+      var(--color-cream-light) 6deg 12deg
+    );
+  border-radius: 9999px;
+}
+
+.letterpress {
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.25),
+    0 -1px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Bordered, badge-style card frame */
+.card-bordered {
+  border: 2px solid var(--color-brown-deep);
+  background-color: var(--color-cream-light);
+  box-shadow:
+    0 0 0 4px var(--color-cream),
+    0 0 0 6px var(--color-brown-deep),
+    8px 8px 0 0 rgba(42, 26, 16, 0.18);
+}
+
+/* Text input — old-typewriter feel */
+.input-paper {
+  background-color: var(--color-cream-light);
+  border: 2px solid var(--color-brown-deep);
+  color: var(--color-brown-deep);
+  font-family: var(--font-stat);
+}
+.input-paper:focus {
+  outline: none;
+  background-color: #fff8e6;
+  box-shadow: 0 0 0 3px var(--color-gold);
+}

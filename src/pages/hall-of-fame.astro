@@ -1,0 +1,104 @@
+---
+import Layout from "../layouts/Layout.astro";
+import BrandName from "../components/BrandName.astro";
+import { HALL_OF_FAME, ASPIRING } from "../data/hallOfFame";
+---
+<Layout title="Tater Tot Index | Name-Brand Hall of Fame">
+  <section class="mx-auto max-w-5xl px-6 py-16">
+    <div class="text-center mb-14">
+      <div class="font-display uppercase tracking-[0.4em] text-xs text-rust mb-3">
+        A Council Exhibition
+      </div>
+      <h1 class="font-display font-bold uppercase text-5xl sm:text-6xl letterpress">
+        The Name-Brand
+        <br />Hall of Fame
+      </h1>
+      <p class="font-serif italic text-lg text-brown-warm mt-5 max-w-2xl mx-auto">
+        Honoring those rare American trademarks that have so thoroughly entered
+        the common tongue that the brand has become the noun. The Council
+        regards them with a mixture of admiration and quiet professional envy.
+      </p>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2">
+      {HALL_OF_FAME.map((entry, i) => (
+        <article class="card-bordered p-6 flex flex-col">
+          <div class="flex items-baseline justify-between gap-3 border-b-2 border-brown-deep/30 pb-3 mb-3">
+            <div>
+              <div class="font-display uppercase tracking-[0.18em] text-[10px] text-rust">
+                Inducted
+              </div>
+              <div class="font-stat text-2xl tabular text-brown-deep">{entry.yearCoined ?? "—"}</div>
+            </div>
+            <div class="text-right">
+              <div class="font-display uppercase tracking-[0.18em] text-[10px] text-rust">
+                No. {String(i + 1).padStart(2, "0")}
+              </div>
+            </div>
+          </div>
+          <h2 class="font-display font-bold uppercase text-3xl text-brown-deep leading-tight">
+            {entry.brand}
+          </h2>
+          <div class="font-serif italic text-base text-brown-warm mt-1">
+            <span class="text-brown-warm/70">a/k/a</span> {entry.generic}
+          </div>
+          <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm mt-3">
+            Origin
+          </div>
+          <div class="font-serif text-sm text-brown-deep">{entry.origin}</div>
+          <p class="font-serif italic text-sm text-brown-warm leading-snug mt-4 border-t border-brown-deep/20 pt-3">
+            "{entry.citation}"
+          </p>
+        </article>
+      ))}
+    </div>
+
+    <!-- Aspiring -->
+    <div class="mt-20">
+      <div class="text-center mb-8">
+        <div class="font-display uppercase tracking-[0.4em] text-xs text-rust mb-2">
+          On the Ballot
+        </div>
+        <h2 class="font-display font-bold uppercase text-4xl letterpress">
+          Awaiting Induction
+        </h2>
+        <p class="font-serif italic text-brown-warm mt-2 max-w-xl mx-auto">
+          A worthy candidate, currently under consideration by the membership committee.
+        </p>
+      </div>
+
+      {ASPIRING.map((entry) => (
+        <article class="card-bordered p-8 max-w-2xl mx-auto bg-gold/15">
+          <div class="text-center">
+            <div class="font-display uppercase tracking-[0.2em] text-[10px] text-rust">
+              Pending Induction &middot; Estimated {entry.yearCoined}
+            </div>
+            <h3 class="font-display font-bold uppercase text-4xl text-brown-deep mt-2">
+              {entry.brand}
+            </h3>
+            <div class="font-serif italic text-base text-brown-warm mt-1">
+              {entry.generic}
+            </div>
+            <div class="rule-ornate my-5">
+              <span class="font-display uppercase tracking-[0.3em] text-[10px]">Origin</span>
+            </div>
+            <div class="font-serif text-sm text-brown-deep">{entry.origin}</div>
+            <p class="font-serif italic text-base text-brown-warm leading-snug mt-5">
+              "{entry.citation}"
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <!-- Closing note -->
+    <div class="mt-20 text-center max-w-2xl mx-auto">
+      <p class="font-serif italic text-base text-brown-warm">
+        The Council notes that <BrandName /> remains, at this time, a properly
+        registered and protected mark. Citizens are encouraged to use the term
+        with care, and to consult the <a href="/" class="underline decoration-rust decoration-2">Index</a>
+        for proper accounting of their daily affairs.
+      </p>
+    </div>
+  </section>
+</Layout>

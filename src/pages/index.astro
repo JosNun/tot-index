@@ -1,0 +1,169 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ComparisonCard from "../components/ComparisonCard.astro";
+import BrandName from "../components/BrandName.astro";
+import {
+  COMPARISONS,
+  CATEGORY_LABELS,
+  CATEGORY_TAGLINES,
+  type Category,
+} from "../data/comparisons";
+import {
+  PRICE_PER_OUNCE,
+  PRICE_PER_TOT,
+  TOT_WEIGHT_GRAMS,
+} from "../data/constants";
+
+const categories: Category[] = ["daily", "transport", "shelter", "tech", "lifestyle", "milestone"];
+const grouped = categories.map((c) => ({
+  key: c,
+  label: CATEGORY_LABELS[c],
+  tagline: CATEGORY_TAGLINES[c],
+  items: COMPARISONS.filter((i) => i.category === c),
+}));
+
+const fmt = (n: number) => n.toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
+---
+<Layout>
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 -z-10">
+      <div class="absolute inset-0 bg-gradient-to-br from-cream via-paper to-cream"></div>
+      <div class="absolute inset-x-0 top-0 h-2 bg-rust"></div>
+      <div class="absolute inset-x-0 top-2 h-1 bg-gold"></div>
+    </div>
+    <div class="mx-auto max-w-6xl px-6 pt-16 pb-20 sm:pt-24 sm:pb-28 text-center">
+      <div class="font-display uppercase tracking-[0.4em] text-xs text-rust mb-4">
+        &mdash; A Public Service of the Council &mdash;
+      </div>
+      <h1 class="font-display font-bold uppercase text-5xl sm:text-7xl lg:text-8xl text-brown-deep leading-[0.9] letterpress">
+        The Tater Tot
+        <br />
+        <span class="text-rust">Index</span>
+      </h1>
+      <p class="font-serif italic text-lg sm:text-xl text-brown-warm mt-6 max-w-2xl mx-auto leading-relaxed">
+        At long last, a unified system for measuring the cost of modern life &mdash;
+        denominated in the most honest unit available to the American household:
+        the crisped, golden cylinder.
+      </p>
+      <div class="mt-10 flex flex-wrap justify-center gap-4">
+        <a
+          href="/calculator"
+          class="inline-block bg-brown-deep text-cream-light px-8 py-4 font-display uppercase tracking-[0.2em] text-sm hover:bg-rust-deep transition-colors border-2 border-brown-deep"
+        >
+          Calculate Your Own
+        </a>
+        <a
+          href="#index"
+          class="inline-block bg-cream-light text-brown-deep px-8 py-4 font-display uppercase tracking-[0.2em] text-sm hover:bg-gold/30 transition-colors border-2 border-brown-deep"
+        >
+          Browse the Index &darr;
+        </a>
+      </div>
+    </div>
+
+    <div class="border-y-2 border-brown-deep bg-brown-deep text-cream-light">
+      <div class="mx-auto max-w-6xl px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div>
+          <div class="font-display uppercase tracking-[0.2em] text-[10px] text-gold">
+            Per Tot
+          </div>
+          <div class="font-stat text-2xl tabular text-cream-light mt-1">
+            {TOT_WEIGHT_GRAMS}<span class="text-base text-cream/60">g</span>
+          </div>
+          <div class="font-serif italic text-[11px] text-cream/60">
+            standardized weight
+          </div>
+        </div>
+        <div>
+          <div class="font-display uppercase tracking-[0.2em] text-[10px] text-gold">
+            Name Brand
+          </div>
+          <div class="font-stat text-2xl tabular text-cream-light mt-1">
+            ${fmt(PRICE_PER_OUNCE.name)}<span class="text-base text-cream/60">/oz</span>
+          </div>
+          <div class="font-serif italic text-[11px] text-cream/60">
+            ${fmt(PRICE_PER_TOT.name)} per tot
+          </div>
+        </div>
+        <div>
+          <div class="font-display uppercase tracking-[0.2em] text-[10px] text-gold">
+            Generic Brand
+          </div>
+          <div class="font-stat text-2xl tabular text-cream-light mt-1">
+            ${fmt(PRICE_PER_OUNCE.generic)}<span class="text-base text-cream/60">/oz</span>
+          </div>
+          <div class="font-serif italic text-[11px] text-cream/60">
+            ${fmt(PRICE_PER_TOT.generic)} per tot
+          </div>
+        </div>
+        <div>
+          <div class="font-display uppercase tracking-[0.2em] text-[10px] text-gold">
+            Founded
+          </div>
+          <div class="font-stat text-2xl tabular text-cream-light mt-1">1953</div>
+          <div class="font-serif italic text-[11px] text-cream/60">
+            Ontario, Oregon
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-6 py-16 sm:py-20 text-center">
+    <div class="font-display uppercase tracking-[0.4em] text-xs text-rust mb-3">
+      A Word from the Council
+    </div>
+    <h2 class="font-display font-bold uppercase text-3xl sm:text-4xl mb-6 letterpress">
+      The Honest Currency of the Pantry
+    </h2>
+    <p class="font-serif text-lg text-brown-warm leading-relaxed">
+      For seventy years, the American family has been asked to weigh the cost of
+      a home against a tank of fuel; a wedding against a college education; an
+      automobile against a hospital stay. The Council finds this confusion
+      unnecessary. <strong class="font-semibold not-italic"><BrandName /></strong> &mdash;
+      crisped, golden, and standardized to {TOT_WEIGHT_GRAMS} grams &mdash;
+      provides a unit so reliable, so universal, that no further conversion is
+      required. We humbly submit the following Index.
+    </p>
+    <div class="font-serif italic text-base text-brown-warm mt-6">
+      &mdash; The Council on Frozen Potato Affairs
+    </div>
+  </section>
+
+  <section id="index" class="mx-auto max-w-6xl px-6 pb-12 space-y-20">
+    {grouped.map((group, idx) => (
+      <div>
+        <div class="text-center mb-10">
+          <div class="font-display uppercase tracking-[0.3em] text-xs text-rust mb-2">
+            Section {String(idx + 1).padStart(2, "0")}
+          </div>
+          <h2 class="font-display font-bold uppercase text-3xl sm:text-4xl letterpress">
+            {group.label}
+          </h2>
+          <p class="font-serif italic text-brown-warm mt-2">{group.tagline}</p>
+        </div>
+        <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {group.items.map((item) => <ComparisonCard item={item} />)}
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <section class="mt-24 bg-rust text-cream-light">
+    <div class="mx-auto max-w-4xl px-6 py-16 text-center">
+      <h2 class="font-display font-bold uppercase text-3xl sm:text-4xl letterpress">
+        Have a Purchase to Reconsider?
+      </h2>
+      <p class="font-serif italic text-lg mt-3 text-cream/90">
+        The Council provides a calculator for the citizen who wishes to apply the
+        Index to their own personal expenditures.
+      </p>
+      <a
+        href="/calculator"
+        class="inline-block mt-8 bg-cream-light text-brown-deep px-8 py-4 font-display uppercase tracking-[0.2em] text-sm hover:bg-gold transition-colors border-2 border-brown-deep"
+      >
+        Open the Calculator
+      </a>
+    </div>
+  </section>
+</Layout>

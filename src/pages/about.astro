@@ -1,0 +1,95 @@
+---
+import Layout from "../layouts/Layout.astro";
+import BrandName from "../components/BrandName.astro";
+import Seal from "../components/Seal.astro";
+---
+<Layout title="Tater Tot Index | About the Council">
+  <section class="mx-auto max-w-3xl px-6 py-16">
+    <div class="text-center mb-14">
+      <div class="font-display uppercase tracking-[0.4em] text-xs text-rust mb-3">
+        A Brief History
+      </div>
+      <h1 class="font-display font-bold uppercase text-5xl sm:text-6xl letterpress">
+        About the Council
+      </h1>
+      <p class="font-serif italic text-lg text-brown-warm mt-4">
+        On Frozen Potato Affairs &middot; Established 1953, Ontario, Oregon
+      </p>
+    </div>
+
+    <div class="flex justify-center mb-12">
+      <Seal size={140} year={1953} />
+    </div>
+
+    <div class="space-y-8 font-serif text-lg text-brown-deep leading-relaxed">
+      <p>
+        In the spring of 1953, in the small town of Ontario, Oregon &mdash; a place
+        whose principal export had long been the russet potato &mdash; two brothers
+        confronted a problem. The slivered scraps left over from the production of
+        the frozen french fry were, by every conventional measure, waste.
+      </p>
+      <p>
+        And yet, those slivered scraps were also the cleanest, most flavorful
+        portion of the potato. Discarding them was, the brothers concluded, a
+        moral failure. They were chopped, seasoned, formed into modest cylinders,
+        and frozen. The result was, to the surprise of no one who has tasted one,
+        magnificent.
+      </p>
+      <p>
+        The Council on Frozen Potato Affairs was constituted shortly thereafter,
+        chartered with a single purpose: to ensure that the American household
+        understood the proper place of <BrandName /> in the modern economy &mdash; not
+        merely as a side dish, but as the most reliable unit of value the
+        domestic kitchen has ever produced.
+      </p>
+      <h2 class="font-display font-bold uppercase text-3xl pt-6 letterpress">
+        Our Methodology
+      </h2>
+      <p>
+        Each tot is standardized at 8.5 grams. Volume is computed at 10
+        milliliters per tot, accounting for ordinary packing density. Prices are
+        established by reference to the prevailing retail rate at the major
+        American grocer:
+      </p>
+      <ul class="list-none pl-0 border-2 border-brown-deep bg-cream-light p-6 space-y-2">
+        <li class="flex justify-between gap-4">
+          <span class="font-serif">Name-Brand <BrandName />:</span>
+          <span class="font-stat tabular text-rust-deep">$0.14 per ounce</span>
+        </li>
+        <li class="flex justify-between gap-4 pt-2 border-t border-brown-deep/20">
+          <span class="font-serif">Generic <BrandName /> (private label):</span>
+          <span class="font-stat tabular text-rust-deep">$0.093 per ounce</span>
+        </li>
+      </ul>
+      <p>
+        The two figures are not, in the Council's view, in competition. The
+        name-brand figure represents the proper standard of quality and consistency
+        the consumer has come to expect. The generic figure represents the
+        prerogative of the thrifty household to obtain a comparable value at a
+        modest discount. Both are accommodated in the Index by way of the brand
+        toggle in the navigation bar above.
+      </p>
+
+      <h2 class="font-display font-bold uppercase text-3xl pt-6 letterpress">
+        A Note on Substitution
+      </h2>
+      <p>
+        The Council does not, in any official capacity, recommend that the citizen
+        actually substitute tots for a residence, an automobile, or a marriage.
+        The Index is intended as an aid to economic perspective, not a
+        prescription. Consult a financial advisor &mdash; and, in matters of nutrition, a
+        registered dietitian &mdash; before making any substantial life change on the
+        basis of this publication.
+      </p>
+    </div>
+
+    <div class="mt-16 text-center">
+      <a
+        href="/"
+        class="inline-block bg-brown-deep text-cream-light px-8 py-4 font-display uppercase tracking-[0.2em] text-sm hover:bg-rust-deep transition-colors border-2 border-brown-deep"
+      >
+        Return to the Index
+      </a>
+    </div>
+  </section>
+</Layout>

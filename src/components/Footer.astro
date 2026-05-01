@@ -1,0 +1,50 @@
+---
+import Seal from "./Seal.astro";
+import BrandName from "./BrandName.astro";
+const year = new Date().getFullYear();
+---
+<footer class="mt-24 border-t-2 border-brown-deep bg-brown-deep text-cream-light">
+  <div class="mx-auto max-w-6xl px-6 py-12 grid gap-8 md:grid-cols-3">
+    <div class="flex items-start gap-4">
+      <Seal size={72} year={1953} />
+      <div>
+        <div class="font-display uppercase tracking-[0.2em] text-xs text-cream/70">
+          A Publication of
+        </div>
+        <div class="font-display font-bold uppercase text-lg tracking-wider letterpress">
+          The Council on Frozen<br />Potato Affairs
+        </div>
+        <p class="font-serif italic text-sm text-cream/70 mt-1">
+          Stewards of the American snack since {1953}.
+        </p>
+      </div>
+    </div>
+    <div>
+      <h3 class="font-display uppercase tracking-[0.2em] text-xs text-gold mb-3">
+        Our Mandate
+      </h3>
+      <p class="font-serif text-sm text-cream/85 leading-relaxed">
+        To inform the consuming public of the proper accounting unit for all major life
+        purchases — whether of provision, transport, or shelter — by reference to the
+        crisped, golden cylinder.
+      </p>
+    </div>
+    <div>
+      <h3 class="font-display uppercase tracking-[0.2em] text-xs text-gold mb-3">
+        Statutory Notice
+      </h3>
+      <p class="font-serif text-xs text-cream/70 leading-relaxed">
+        <BrandName /> is a registered trademark of Ore-Ida Foods, a division of the
+        H.J. Heinz Company. All comparisons herein are computed at retail
+        prevailing prices and are intended for illustrative purposes. Consult a
+        nutritionist before substituting tots for a residence.
+      </p>
+    </div>
+  </div>
+  <div class="border-t border-cream/15 py-4">
+    <div class="mx-auto max-w-6xl px-6 flex items-center justify-between font-display uppercase tracking-[0.2em] text-[10px] text-cream/60">
+      <span>&copy; {year} The Council. All rights reserved.</span>
+      <span>Vol. {year - 1953}, No. 1</span>
+    </div>
+  </div>
+</footer>

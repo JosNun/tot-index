@@ -1,0 +1,55 @@
+---
+import BrandToggle from "./BrandToggle.astro";
+import Seal from "./Seal.astro";
+const path = Astro.url.pathname;
+const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
+const navItems = [
+  { href: "/", label: "The Index" },
+  { href: "/calculator", label: "Calculator" },
+  { href: "/hall-of-fame", label: "Hall of Fame" },
+  { href: "/about", label: "About the Council" },
+];
+---
+<header class="border-b-2 border-brown-deep bg-cream-light/80 backdrop-blur">
+  <div class="mx-auto max-w-6xl px-6 py-3 flex items-center justify-between gap-4">
+    <a href="/" class="flex items-center gap-3 group">
+      <Seal size={56} year={1953} />
+      <div class="leading-tight">
+        <div class="font-display uppercase tracking-[0.2em] text-[10px] text-brown-warm">
+          The Official
+        </div>
+        <div class="font-display font-bold uppercase tracking-wider text-xl text-brown-deep letterpress">
+          Tater Tot Index
+        </div>
+        <div class="font-serif italic text-[11px] text-brown-warm">
+          A Council on Frozen Potato Affairs publication
+        </div>
+      </div>
+    </a>
+    <div class="hidden lg:block">
+      <BrandToggle />
+    </div>
+  </div>
+  <nav class="bg-brown-deep text-cream-light">
+    <div class="mx-auto max-w-6xl px-6 flex flex-wrap items-center justify-between gap-2">
+      <ul class="flex flex-wrap items-center font-display uppercase tracking-[0.2em] text-xs">
+        {navItems.map((it) => (
+          <li>
+            <a
+              href={it.href}
+              class:list={[
+                "block px-4 py-3 transition-colors hover:bg-rust-deep",
+                isActive(it.href) && "bg-rust text-cream-light",
+              ]}
+            >
+              {it.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <div class="lg:hidden py-2 pr-4">
+        <BrandToggle />
+      </div>
+    </div>
+  </nav>
+</header>

@@ -1,0 +1,11 @@
+---
+type Props = { short?: boolean; lower?: boolean };
+const { short = false, lower = false } = Astro.props;
+
+const name = short ? "Tater Tots" : "Tater Tots";
+const generic = short
+  ? "Taters"
+  : "Taters Seasoned Shredded Potatoes";
+const display = (s: string) => (lower ? s.toLowerCase() : s);
+---
+<span class="brand-name">{display(name)}</span><span class="brand-generic">{display(generic)}</span>

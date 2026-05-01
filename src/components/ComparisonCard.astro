@@ -1,0 +1,52 @@
+---
+import type { Comparison } from "../data/comparisons";
+import { CATEGORY_LABELS } from "../data/comparisons";
+import { PRICE_PER_TOT } from "../data/constants";
+import { formatTotCount, formatPrice } from "../lib/format";
+
+interface Props {
+  item: Comparison;
+}
+const { item } = Astro.props;
+
+const totsName = item.priceUsd / PRICE_PER_TOT.name;
+const totsGeneric = item.priceUsd / PRICE_PER_TOT.generic;
+---
+<article class="card-bordered p-6 sm:p-8 flex flex-col h-full">
+  <div class="flex items-center justify-between gap-3 mb-3">
+    <span class="font-display uppercase tracking-[0.2em] text-[10px] text-rust">
+      {CATEGORY_LABELS[item.category]}
+    </span>
+    <span class="font-serif italic text-[11px] text-brown-warm tabular">
+      {formatPrice(item.priceUsd)}
+    </span>
+  </div>
+
+  <h3 class="font-display font-bold uppercase text-xl sm:text-2xl text-brown-deep leading-tight">
+    {item.name}
+  </h3>
+
+  <div class="rule-ornate my-5">
+    <span class="font-display uppercase tracking-[0.3em] text-[10px]">Equates To</span>
+  </div>
+
+  <div class="text-center mb-5">
+    <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm mb-1">
+      <span class="brand-name">Tater Tots</span><span class="brand-generic">Taters</span>
+    </div>
+    <div class="font-stat text-rust-deep tabular leading-none text-5xl sm:text-6xl">
+      <span class="brand-name">{formatTotCount(totsName)}</span><span class="brand-generic">{formatTotCount(totsGeneric)}</span>
+    </div>
+    <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm mt-2">
+      Crisped Cylinders
+    </div>
+  </div>
+
+  <p class="font-serif italic text-sm text-brown-warm text-center leading-snug border-t border-brown-deep/20 pt-4 mt-auto">
+    "{item.spatial}"
+  </p>
+
+  <p class="font-serif text-xs text-brown-warm/80 text-center mt-2">
+    {item.blurb}
+  </p>
+</article>

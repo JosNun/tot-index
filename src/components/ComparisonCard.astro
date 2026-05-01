@@ -12,7 +12,10 @@ const { item } = Astro.props;
 const totsName = item.priceUsd / PRICE_PER_TOT.name;
 const totsGeneric = item.priceUsd / PRICE_PER_TOT.generic;
 ---
-<article class="card-bordered p-6 sm:p-8 flex flex-col h-full">
+<a
+  href={`/index/${item.id}`}
+  class="card-bordered p-6 sm:p-8 flex flex-col h-full no-underline transition-transform hover:-translate-y-0.5 hover:shadow-[12px_12px_0_0_rgba(42,26,16,0.22)]"
+>
   <div class="flex items-center justify-between gap-3 mb-3">
     <span class="font-display uppercase tracking-[0.2em] text-[10px] text-rust">
       {CATEGORY_LABELS[item.category]}
@@ -49,4 +52,4 @@ const totsGeneric = item.priceUsd / PRICE_PER_TOT.generic;
   <p class="font-serif text-xs text-brown-warm/80 text-center mt-2">
     {item.blurb}
   </p>
-</article>
+</a>

@@ -7,17 +7,100 @@ import {
   TOT_WEIGHT_GRAMS,
 } from "../data/constants";
 
-const presets = [
-  { label: "A Latte", value: 6.5 },
-  { label: "Tank of Gas", value: 65 },
-  { label: "iPhone", value: 999 },
-  { label: "Used Sedan", value: 18000 },
-  { label: "Wedding", value: 35000 },
-  { label: "Family Home", value: 450000 },
-  { label: "Powerball Jackpot", value: 100_000_000 },
-];
+// Each mode declares: input units (with conversion to a base scalar)
+// and a small set of culturally-fluent presets.
+//
+// Base units used internally:
+//   price    -> USD
+//   weight   -> grams        (1 tot = 8.5 g)
+//   volume   -> milliliters  (1 tot = 10 ml)
+//   distance -> millimeters  (1 tot = 25 mm, end-to-end)
+
+const MODES = {
+  price: {
+    label: "Price",
+    units: [{ key: "usd", label: "USD ($)", factor: 1 }],
+    defaultUnit: "usd",
+    placeholder: "450000",
+    defaultValue: 450000,
+    presets: [
+      { label: "A Latte", value: 6.5, unit: "usd" },
+      { label: "Tank of Gas", value: 65, unit: "usd" },
+      { label: "iPhone", value: 999, unit: "usd" },
+      { label: "Used Sedan", value: 18000, unit: "usd" },
+      { label: "Wedding", value: 35000, unit: "usd" },
+      { label: "Family Home", value: 450000, unit: "usd" },
+      { label: "Powerball Jackpot", value: 100_000_000, unit: "usd" },
+    ],
+  },
+  weight: {
+    label: "Weight",
+    units: [
+      { key: "oz", label: "ounces", factor: 28.3495 },
+      { key: "lb", label: "pounds", factor: 453.592 },
+      { key: "kg", label: "kilograms", factor: 1000 },
+      { key: "ton", label: "tons (US)", factor: 907184.74 },
+    ],
+    defaultUnit: "lb",
+    placeholder: "180",
+    defaultValue: 180,
+    presets: [
+      { label: "A Big Mac", value: 7.6, unit: "oz" },
+      { label: "A 32oz Bag of Tots", value: 32, unit: "oz" },
+      { label: "A Bowling Ball", value: 12, unit: "lb" },
+      { label: "An Average Adult", value: 180, unit: "lb" },
+      { label: "A Compact Car", value: 3000, unit: "lb" },
+      { label: "An Elephant", value: 6, unit: "ton" },
+      { label: "A Blue Whale", value: 150, unit: "ton" },
+    ],
+  },
+  volume: {
+    label: "Volume",
+    units: [
+      { key: "floz", label: "fluid ounces", factor: 29.5735 },
+      { key: "cup", label: "cups", factor: 236.588 },
+      { key: "gal", label: "gallons (US)", factor: 3785.41 },
+      { key: "cuft", label: "cubic feet", factor: 28316.85 },
+      { key: "cum", label: "cubic meters", factor: 1_000_000 },
+    ],
+    defaultUnit: "gal",
+    placeholder: "40",
+    defaultValue: 40,
+    presets: [
+      { label: "A Coffee Mug", value: 12, unit: "floz" },
+      { label: "A Soup Pot", value: 8, unit: "cup" },
+      { label: "A Bathtub", value: 40, unit: "gal" },
+      { label: "A Refrigerator", value: 20, unit: "cuft" },
+      { label: "A 2,000 sq ft Home", value: 16000, unit: "cuft" },
+      { label: "An Olympic Pool", value: 88_000, unit: "cuft" },
+    ],
+  },
+  distance: {
+    label: "Distance",
+    units: [
+      { key: "in", label: "inches", factor: 25.4 },
+      { key: "ft", label: "feet", factor: 304.8 },
+      { key: "mi", label: "miles", factor: 1_609_344 },
+      { key: "km", label: "kilometers", factor: 1_000_000 },
+    ],
+    defaultUnit: "mi",
+    placeholder: "26.2",
+    defaultValue: 26.2,
+    presets: [
+      { label: "Across the Living Room", value: 15, unit: "ft" },
+      { label: "A Football Field", value: 100, unit: "ft" },
+      { label: "A Marathon", value: 26.2, unit: "mi" },
+      { label: "Cross-Country Drive", value: 2800, unit: "mi" },
+      { label: "Around the Earth", value: 24901, unit: "mi" },
+      { label: "To the Moon", value: 238855, unit: "mi" },
+    ],
+  },
+} as const;
+
+type ModeKey = keyof typeof MODES;
+const MODE_KEYS: ModeKey[] = ["price", "weight", "volume", "distance"];
 ---
-<Layout title="Tater Tot Index | Calculator">
+<Layout title="Tater Tot Index | Calculator" og="calculator">
   <section class="mx-auto max-w-4xl px-6 py-16">
     <div class="text-center mb-12">
       <div class="font-display uppercase tracking-[0.4em] text-xs text-rust mb-3">
@@ -27,57 +110,77 @@ const presets = [
         Conversion Calculator
       </h1>
       <p class="font-serif italic text-lg text-brown-warm mt-4 max-w-2xl mx-auto">
-        Submit any sum &mdash; in U.S. dollars &mdash; for evaluation in the proper unit.
-        The Council's calculator returns crisped cylinders, weight, and volumetric
-        coverage.
+        Submit a quantity in any of the four standard dimensions. The Council's
+        calculator returns the equivalent in crisped, golden cylinders &mdash;
+        with full accounting of weight, volume, length, and price.
       </p>
     </div>
 
     <div class="card-bordered p-6 sm:p-10">
+      <!-- MODE TABS -->
+      <div class="font-display uppercase tracking-[0.2em] text-xs text-brown-warm mb-2">
+        Convert by
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 border-2 border-brown-deep mb-6">
+        {MODE_KEYS.map((m, i) => (
+          <button
+            type="button"
+            data-mode-tab={m}
+            class:list={[
+              "mode-tab font-display uppercase tracking-[0.2em] text-xs sm:text-sm py-3 transition-colors",
+              "data-[active=true]:bg-brown-deep data-[active=true]:text-cream-light",
+              "hover:bg-gold/30",
+              i > 0 && "border-l-2 border-brown-deep",
+              i === 2 && "border-l-2 sm:border-l-2 border-t-2 sm:border-t-0 border-brown-deep",
+              i === 3 && "border-l-2 sm:border-l-2 border-t-2 sm:border-t-0 border-brown-deep",
+            ]}
+          >
+            {MODES[m].label}
+          </button>
+        ))}
+      </div>
+
+      <!-- INPUT ROW (label + value + unit) -->
       <label class="block">
-        <div class="font-display uppercase tracking-[0.2em] text-xs text-brown-warm mb-2">
-          Enter an Amount in U.S. Dollars
+        <div id="calc-input-label" class="font-display uppercase tracking-[0.2em] text-xs text-brown-warm mb-2">
+          Enter an amount in U.S. dollars
         </div>
-        <div class="flex items-center border-2 border-brown-deep bg-cream-light">
-          <span class="px-4 font-stat text-3xl text-brown-warm">$</span>
+        <div class="flex items-stretch border-2 border-brown-deep bg-cream-light">
+          <span id="calc-prefix" class="px-4 font-stat text-3xl text-brown-warm flex items-center">$</span>
           <input
             id="calc-input"
             type="number"
             inputmode="decimal"
             min="0"
-            step="0.01"
+            step="any"
             value="450000"
-            class="input-paper border-0 flex-1 px-2 py-4 text-3xl tabular w-full focus:outline-none"
-            aria-label="Dollar amount"
+            class="input-paper border-0 flex-1 px-2 py-4 text-2xl sm:text-3xl tabular w-full focus:outline-none"
+            aria-label="Quantity"
           />
+          <select
+            id="calc-unit"
+            class="hidden font-display uppercase tracking-[0.15em] text-xs text-brown-deep bg-cream-light border-l-2 border-brown-deep px-3 py-2 focus:outline-none"
+            aria-label="Unit"
+          ></select>
         </div>
       </label>
 
+      <!-- PRESETS -->
       <div class="mt-4">
         <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm mb-2">
           Or select a preset
         </div>
-        <div class="flex flex-wrap gap-2">
-          {presets.map((p) => (
-            <button
-              type="button"
-              data-preset={p.value}
-              class="preset-btn bg-cream-light hover:bg-gold/40 text-brown-deep border-2 border-brown-deep font-display uppercase tracking-[0.15em] text-[11px] px-3 py-2 transition-colors"
-            >
-              {p.label}
-              <span class="text-brown-warm/70 ml-1 normal-case font-serif italic">${p.value.toLocaleString()}</span>
-            </button>
-          ))}
-        </div>
+        <div id="calc-presets" class="flex flex-wrap gap-2"></div>
       </div>
 
       <div class="rule-ornate my-10">
         <span class="font-display uppercase tracking-[0.3em] text-[10px]">The Verdict</span>
       </div>
 
+      <!-- HEADLINE TOT COUNT -->
       <div class="text-center">
         <div class="font-display uppercase tracking-[0.2em] text-xs text-brown-warm">
-          That sum, denominated in <BrandName />:
+          That quantity, denominated in <BrandName />:
         </div>
         <div class="my-4">
           <div id="calc-tots" class="font-stat text-rust-deep tabular leading-none text-6xl sm:text-7xl">&mdash;</div>
@@ -87,7 +190,14 @@ const presets = [
         </div>
       </div>
 
-      <div class="grid sm:grid-cols-3 gap-4 mt-10">
+      <!-- 4-UP STAT GRID -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
+        <div class="border-2 border-brown-deep bg-rust text-cream-light p-4 text-center">
+          <div class="font-display uppercase tracking-[0.18em] text-[10px] text-gold">
+            Equivalent Cost
+          </div>
+          <div id="calc-cost" class="font-stat text-2xl tabular mt-1">&mdash;</div>
+        </div>
         <div class="border-2 border-brown-deep bg-cream-light p-4 text-center">
           <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
             Total Weight
@@ -108,6 +218,7 @@ const presets = [
         </div>
       </div>
 
+      <!-- NARRATIVE -->
       <div class="mt-10 border-2 border-brown-deep bg-paper p-6">
         <div class="font-display uppercase tracking-[0.2em] text-xs text-rust mb-2">
           Spatial Visualization
@@ -117,6 +228,7 @@ const presets = [
         </p>
       </div>
 
+      <!-- 3-UP SPATIAL COMPARISONS -->
       <div class="mt-6 grid sm:grid-cols-3 gap-4">
         <div class="border-2 border-brown-deep p-4">
           <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
@@ -152,10 +264,10 @@ const presets = [
       </div>
 
       <div class="mt-10 text-center font-serif italic text-sm text-brown-warm">
-        Computed at the prevailing retail price of
+        Each tot standardized to {TOT_WEIGHT_GRAMS} grams, 10 milliliters, and 25 millimeters
+        in length. Pricing per the prevailing retail rate of
         <span class="brand-name">${PRICE_PER_OUNCE.name.toFixed(2)}/oz (Tater Tots&reg;)</span><span
-          class="brand-generic">${PRICE_PER_OUNCE.generic.toFixed(3)}/oz (generic)</span>,
-        with each tot standardized to {TOT_WEIGHT_GRAMS}g.
+          class="brand-generic">${PRICE_PER_OUNCE.generic.toFixed(3)}/oz (generic)</span>.
       </div>
     </div>
   </section>
@@ -165,11 +277,23 @@ const presets = [
     define:vars={{
       PRICE_PER_TOT,
       TOT_WEIGHT_GRAMS,
+      MODES,
     }}
   >
     (function () {
-      const input = document.getElementById("calc-input");
+      const TOT_VOLUME_ML = 10;
+      const TOT_LENGTH_MM = 25;
+      const MOON_DISTANCE_M = 384_400_000;
+      const POOL_CUFT = 2560; // 16 x 32 x 5 standard inground
+      const HOUSE_SQFT = 2000;
+
+      const elInput = document.getElementById("calc-input");
+      const elUnit = document.getElementById("calc-unit");
+      const elPrefix = document.getElementById("calc-prefix");
+      const elInputLabel = document.getElementById("calc-input-label");
+      const elPresets = document.getElementById("calc-presets");
       const elTots = document.getElementById("calc-tots");
+      const elCost = document.getElementById("calc-cost");
       const elWeight = document.getElementById("calc-weight");
       const elVolume = document.getElementById("calc-volume");
       const elLength = document.getElementById("calc-length");
@@ -178,8 +302,9 @@ const presets = [
       const elPool = document.getElementById("calc-pool");
       const elMoon = document.getElementById("calc-moon");
 
-      const MOON_DISTANCE_M = 384_400_000;
+      let currentMode = "price";
 
+      // ---------- formatters ----------
       function fmtTots(n) {
         if (!isFinite(n) || n < 0) return "—";
         if (n < 10) return n.toFixed(1);
@@ -194,7 +319,18 @@ const presets = [
         }
         return (n / 1_000_000_000_000).toFixed(2) + " trillion";
       }
-
+      function fmtPrice(usd) {
+        if (!isFinite(usd) || usd < 0) return "—";
+        if (usd < 1) return "$" + usd.toFixed(2);
+        if (usd < 1_000) return "$" + usd.toLocaleString("en-US", { maximumFractionDigits: 0 });
+        if (usd < 1_000_000) return "$" + Math.round(usd).toLocaleString("en-US");
+        if (usd < 1_000_000_000) {
+          const m = usd / 1_000_000;
+          return "$" + (m >= 10 ? m.toFixed(1) : m.toFixed(2)) + "M";
+        }
+        const b = usd / 1_000_000_000;
+        return "$" + (b >= 10 ? b.toFixed(1) : b.toFixed(2)) + "B";
+      }
       function fmtWeight(grams) {
         const lbs = grams / 453.592;
         if (lbs < 1) return (lbs * 16).toFixed(1) + " oz";
@@ -203,30 +339,39 @@ const presets = [
         if (tons < 1000) return tons.toLocaleString("en-US", { maximumFractionDigits: tons < 100 ? 1 : 0 }) + " tons";
         return (tons / 1000).toFixed(1) + "K tons";
       }
-
       function fmtVolumeCuFt(cf) {
         if (cf < 1) return (cf * 1728).toFixed(1) + " cu. in.";
         if (cf < 10000) return cf.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " cu. ft.";
         return Math.round(cf).toLocaleString("en-US") + " cu. ft.";
       }
-
       function fmtLength(meters) {
         if (meters < 1) return (meters * 100).toFixed(1) + " cm";
         if (meters < 1000) return meters.toLocaleString("en-US", { maximumFractionDigits: 1 }) + " m";
         const km = meters / 1000;
         const miles = km * 0.621371;
         return km.toLocaleString("en-US", { maximumFractionDigits: 0 }) + " km (" +
-               miles.toLocaleString("en-US", { maximumFractionDigits: 0 }) + " miles)";
+               miles.toLocaleString("en-US", { maximumFractionDigits: 0 }) + " mi)";
       }
-
       function fmtDepth(feet) {
         if (feet < 1 / 12) return (feet * 12).toFixed(2) + " inches deep";
         if (feet < 1) return (feet * 12).toFixed(1) + " inches deep";
         if (feet < 100) return feet.toFixed(1) + " feet deep";
         return Math.round(feet).toLocaleString("en-US") + " feet deep";
       }
-
-      function spatialBlurb(tots, cuFt) {
+      function fmtMoon(fraction) {
+        if (fraction < 0.00001) return (fraction * 100).toFixed(5) + "% of the way";
+        if (fraction < 0.0001) return (fraction * 100).toFixed(4) + "% of the way";
+        if (fraction < 0.01) return (fraction * 100).toFixed(3) + "% of the way";
+        if (fraction < 1) return (fraction * 100).toFixed(2) + "% of the way";
+        if (fraction < 10) return fraction.toFixed(2) + "× lunar distance";
+        return Math.round(fraction).toLocaleString("en-US") + "× lunar distance";
+      }
+      function fmtPool(fraction) {
+        if (fraction < 1) return Math.round(fraction * 100) + "% of the pool";
+        if (fraction < 10) return fraction.toFixed(1) + "× the pool";
+        return Math.round(fraction).toLocaleString("en-US") + "× the pool";
+      }
+      function spatialBlurb(tots) {
         if (tots <= 0) return "—";
         if (tots < 50) return "A modest snack — fits comfortably in the palm of one hand.";
         if (tots < 500) return "Enough to fill a coffee cup, with a generous dusting of seasoning.";
@@ -240,66 +385,115 @@ const presets = [
         return "Tots in such quantity that the Council recommends consulting a logistics professional.";
       }
 
-      function update() {
-        const dollars = parseFloat(input.value);
-        if (!isFinite(dollars) || dollars < 0) {
-          elTots.textContent = "—";
-          elWeight.textContent = "—";
-          elVolume.textContent = "—";
-          elLength.textContent = "—";
-          elSpatial.textContent = "—";
-          elHouse.textContent = "—";
-          elPool.textContent = "—";
-          elMoon.textContent = "—";
-          return;
-        }
-        const brand = document.documentElement.dataset.brand === "generic" ? "generic" : "name";
-        const pricePerTot = PRICE_PER_TOT[brand];
-        const tots = dollars / pricePerTot;
-        const grams = tots * TOT_WEIGHT_GRAMS;
-        const cuFt = (tots * 10) / 28316.85;          // 10 ml/tot
-        const lengthMeters = tots * 0.025;             // 25mm/tot
-        const houseDepth = cuFt / 2000;                // 2,000 sq ft footprint
-        const poolFraction = cuFt / 2560;              // 16x32x5 ft pool
-
-        elTots.textContent = fmtTots(tots);
-        elWeight.textContent = fmtWeight(grams);
-        elVolume.textContent = fmtVolumeCuFt(cuFt);
-        elLength.textContent = fmtLength(lengthMeters);
-        elSpatial.textContent = spatialBlurb(tots, cuFt);
-        elHouse.textContent = fmtDepth(houseDepth);
-        elPool.textContent =
-          poolFraction < 1
-            ? Math.round(poolFraction * 100) + "% of the pool"
-            : poolFraction < 10
-              ? poolFraction.toFixed(1) + "× the pool's volume"
-              : Math.round(poolFraction).toLocaleString("en-US") + "× the pool's volume";
-
-        const moonFraction = lengthMeters / MOON_DISTANCE_M;
-        if (moonFraction < 0.00001) {
-          elMoon.textContent = (moonFraction * 100).toFixed(5) + "% of the way";
-        } else if (moonFraction < 0.0001) {
-          elMoon.textContent = (moonFraction * 100).toFixed(4) + "% of the way";
-        } else if (moonFraction < 0.01) {
-          elMoon.textContent = (moonFraction * 100).toFixed(3) + "% of the way";
-        } else if (moonFraction < 1) {
-          elMoon.textContent = (moonFraction * 100).toFixed(2) + "% of the way";
-        } else if (moonFraction < 10) {
-          elMoon.textContent = moonFraction.toFixed(2) + "× the lunar distance";
-        } else {
-          elMoon.textContent = Math.round(moonFraction).toLocaleString("en-US") + "× the lunar distance";
-        }
+      // ---------- mode handling ----------
+      function brand() {
+        return document.documentElement.dataset.brand === "generic" ? "generic" : "name";
       }
 
-      input.addEventListener("input", update);
-      window.addEventListener("brandchange", update);
-      document.querySelectorAll("[data-preset]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          input.value = btn.dataset.preset;
-          update();
+      function totsFromInput(mode, value, unitKey) {
+        const cfg = MODES[mode];
+        const unit = cfg.units.find((u) => u.key === unitKey) || cfg.units[0];
+        const baseValue = value * unit.factor;
+        if (mode === "price")    return baseValue / PRICE_PER_TOT[brand()];
+        if (mode === "weight")   return baseValue / TOT_WEIGHT_GRAMS;
+        if (mode === "volume")   return baseValue / TOT_VOLUME_ML;
+        if (mode === "distance") return baseValue / TOT_LENGTH_MM;
+        return 0;
+      }
+
+      function setMode(mode) {
+        currentMode = mode;
+        const cfg = MODES[mode];
+
+        // Active tab
+        document.querySelectorAll("[data-mode-tab]").forEach((b) => {
+          b.dataset.active = String(b.dataset.modeTab === mode);
         });
+
+        // Label and prefix
+        elInputLabel.textContent =
+          mode === "price"
+            ? "Enter an amount in U.S. dollars"
+            : "Enter a " + cfg.label.toLowerCase();
+        elPrefix.textContent = mode === "price" ? "$" : "#";
+        elPrefix.classList.toggle("hidden", mode !== "price");
+
+        // Unit selector
+        if (cfg.units.length > 1 || mode !== "price") {
+          elUnit.classList.toggle("hidden", cfg.units.length <= 1);
+          elUnit.innerHTML = cfg.units
+            .map((u) => `<option value="${u.key}">${u.label}</option>`)
+            .join("");
+          elUnit.value = cfg.defaultUnit;
+        } else {
+          elUnit.classList.add("hidden");
+        }
+
+        // Default value
+        elInput.value = String(cfg.defaultValue);
+
+        // Presets
+        elPresets.innerHTML = "";
+        cfg.presets.forEach((p) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className =
+            "preset-btn bg-cream-light hover:bg-gold/40 text-brown-deep border-2 border-brown-deep " +
+            "font-display uppercase tracking-[0.15em] text-[11px] px-3 py-2 transition-colors";
+          const unitLabel = cfg.units.find((u) => u.key === p.unit)?.label || "";
+          btn.innerHTML =
+            p.label +
+            ` <span class="text-brown-warm/70 ml-1 normal-case font-serif italic">${
+              p.value.toLocaleString()
+            } ${unitLabel}</span>`;
+          btn.addEventListener("click", () => {
+            elInput.value = String(p.value);
+            elUnit.value = p.unit;
+            update();
+          });
+          elPresets.appendChild(btn);
+        });
+
+        update();
+      }
+
+      function update() {
+        const value = parseFloat(elInput.value);
+        const unit = elUnit.value || MODES[currentMode].defaultUnit;
+
+        if (!isFinite(value) || value < 0) {
+          [elTots, elCost, elWeight, elVolume, elLength, elHouse, elPool, elMoon].forEach(
+            (el) => (el.textContent = "—")
+          );
+          elSpatial.textContent = "—";
+          return;
+        }
+
+        const tots = totsFromInput(currentMode, value, unit);
+        const grams = tots * TOT_WEIGHT_GRAMS;
+        const cuFt = (tots * TOT_VOLUME_ML) / 28316.85;
+        const lengthM = (tots * TOT_LENGTH_MM) / 1000;
+        const cost = tots * PRICE_PER_TOT[brand()];
+
+        elTots.textContent = fmtTots(tots);
+        elCost.textContent = fmtPrice(cost);
+        elWeight.textContent = fmtWeight(grams);
+        elVolume.textContent = fmtVolumeCuFt(cuFt);
+        elLength.textContent = fmtLength(lengthM);
+        elSpatial.textContent = spatialBlurb(tots);
+        elHouse.textContent = fmtDepth(cuFt / HOUSE_SQFT);
+        elPool.textContent = fmtPool(cuFt / POOL_CUFT);
+        elMoon.textContent = fmtMoon(lengthM / MOON_DISTANCE_M);
+      }
+
+      document.querySelectorAll("[data-mode-tab]").forEach((btn) => {
+        btn.addEventListener("click", () => setMode(btn.dataset.modeTab));
       });
-      update();
+      elInput.addEventListener("input", update);
+      elUnit.addEventListener("change", update);
+      window.addEventListener("brandchange", update);
+
+      setMode("price");
     })();
   </script>
 </Layout>

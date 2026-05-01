@@ -1,0 +1,84 @@
+---
+type Props = { class?: string };
+const { class: className = "" } = Astro.props;
+
+const RAY_COUNT = 20;
+const rays = Array.from({ length: RAY_COUNT }, (_, i) => {
+  const angle = (360 / RAY_COUNT) * i;
+  const long = i % 2 === 0;
+  return { angle, len: long ? 320 : 240, width: long ? 14 : 7 };
+});
+---
+<svg
+  viewBox="0 0 600 440"
+  class={className}
+  xmlns="http://www.w3.org/2000/svg"
+  aria-label="An illustrated golden tater tot, presented as the official subject of the Tater Tot Index."
+  role="img"
+>
+  <!-- Sunburst -->
+  <g transform="translate(300 220)">
+    {rays.map((r) => (
+      <rect
+        x={-r.width / 2}
+        y={-r.len}
+        width={r.width}
+        height={r.len * 0.85}
+        rx={r.width / 2}
+        fill="#d4a437"
+        opacity="0.55"
+        transform={`rotate(${r.angle})`}
+      />
+    ))}
+    <!-- Inner soft halo -->
+    <circle cx="0" cy="0" r="160" fill="#fbf1d4" opacity="0.55" />
+    <!-- Concentric ring frames -->
+    <circle cx="0" cy="0" r="170" fill="none" stroke="#b88a1f" stroke-width="2" opacity="0.6" />
+    <circle cx="0" cy="0" r="178" fill="none" stroke="#b88a1f" stroke-width="0.8" opacity="0.4" stroke-dasharray="3 4" />
+  </g>
+
+  <!-- Decorative side sparkles -->
+  <g fill="#b5421c">
+    <path d="M 80 110 l 7 -18 l 7 18 l 18 7 l -18 7 l -7 18 l -7 -18 l -18 -7 z" />
+    <path d="M 510 290 l 5 -12 l 5 12 l 12 5 l -12 5 l -5 12 l -5 -12 l -12 -5 z" opacity="0.85" />
+  </g>
+  <g fill="#d4a437">
+    <path d="M 490 80 l 6 -14 l 6 14 l 14 6 l -14 6 l -6 14 l -6 -14 l -14 -6 z" />
+    <path d="M 110 320 l 5 -12 l 5 12 l 12 5 l -12 5 l -5 12 l -5 -12 l -12 -5 z" />
+  </g>
+
+  <!-- Cast shadow -->
+  <ellipse cx="300" cy="345" rx="195" ry="16" fill="#2a1a10" opacity="0.22" />
+
+  <!-- The tot — cel-shaded layered pill -->
+  <g transform="translate(300 230) rotate(-12)">
+    <!-- Outline -->
+    <rect x="-200" y="-66" width="400" height="132" rx="66" fill="#2a1a10" />
+    <!-- Deep shadow body -->
+    <rect x="-194" y="-60" width="388" height="120" rx="60" fill="#7a4f1a" />
+    <!-- Midtone -->
+    <rect x="-194" y="-60" width="388" height="100" rx="50" fill="#b88a1f" />
+    <!-- Top half highlight -->
+    <rect x="-194" y="-60" width="388" height="64" rx="32" fill="#d4a437" />
+    <!-- Top sheen band -->
+    <rect x="-176" y="-54" width="352" height="14" rx="7" fill="#e8c266" />
+    <!-- Brightest sheen -->
+    <rect x="-100" y="-52" width="100" height="6" rx="3" fill="#f6dd96" />
+    <!-- Soft side curvature highlights at the rounded ends -->
+    <ellipse cx="-180" cy="0" rx="14" ry="40" fill="#7a4f1a" opacity="0.35" />
+    <ellipse cx="180" cy="0" rx="14" ry="40" fill="#7a4f1a" opacity="0.35" />
+
+    <!-- Seasoning dimples -->
+    <ellipse cx="-120" cy="18" rx="11" ry="6" fill="#5b3a21" opacity="0.7" />
+    <ellipse cx="-55" cy="26" rx="8" ry="5" fill="#5b3a21" opacity="0.6" />
+    <ellipse cx="20" cy="14" rx="12" ry="6" fill="#5b3a21" opacity="0.72" />
+    <ellipse cx="85" cy="24" rx="7" ry="4" fill="#5b3a21" opacity="0.55" />
+    <ellipse cx="140" cy="16" rx="9" ry="5" fill="#5b3a21" opacity="0.62" />
+    <ellipse cx="-160" cy="6" rx="5" ry="3" fill="#5b3a21" opacity="0.5" />
+
+    <!-- Crisp sparkle highlights on the sheen -->
+    <circle cx="-90" cy="-36" r="3.5" fill="#fffbe6" />
+    <circle cx="60" cy="-38" r="2.5" fill="#fffbe6" />
+    <circle cx="120" cy="-34" r="1.8" fill="#fffbe6" opacity="0.85" />
+  </g>
+</svg>

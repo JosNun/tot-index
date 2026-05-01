@@ -6,11 +6,16 @@ import Footer from "../components/Footer.astro";
 type Props = {
   title?: string;
   description?: string;
+  /** Filename in /public/og/, e.g. "home" -> /og/home.png */
+  og?: string;
 };
 const {
   title = "The Tater Tot Index",
   description = "The official accounting of all major life purchases in the proper unit: the crisped, golden cylinder. A publication of the Council on Frozen Potato Affairs.",
+  og = "home",
 } = Astro.props;
+const ogUrl = new URL(`/og/${og}.png`, Astro.site ?? Astro.url).toString();
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
 ---
 <!doctype html>
 <html lang="en" data-brand="name">
@@ -18,6 +23,18 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogUrl} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

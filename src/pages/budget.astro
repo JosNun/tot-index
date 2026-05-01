@@ -1,0 +1,284 @@
+---
+import Layout from "../layouts/Layout.astro";
+import BrandName from "../components/BrandName.astro";
+import {
+  COMPARISONS,
+  CATEGORY_LABELS,
+  CATEGORY_ORDER,
+} from "../data/comparisons";
+import { PRICE_PER_TOT } from "../data/constants";
+
+const grouped = CATEGORY_ORDER.map((c) => ({
+  key: c,
+  label: CATEGORY_LABELS[c],
+  items: COMPARISONS.filter((i) => i.category === c),
+})).filter((g) => g.items.length > 0);
+
+const presets = [
+  { label: "A Handful", value: 50 },
+  { label: "A Standard Bag", value: 107 },
+  { label: "A Catering Pan", value: 800 },
+  { label: "A Pallet", value: 50_000 },
+  { label: "A Truckload", value: 500_000 },
+  { label: "A Million Tots", value: 1_000_000 },
+  { label: "A Billion Tots", value: 1_000_000_000 },
+  { label: "Earth-to-Moon Bridge", value: 15_376_000_000 },
+];
+---
+<Layout
+  title="Tater Tot Index | The Budget"
+  description="The reverse calculator: enter a tot allowance and see what it affords across the Index."
+  og="budget"
+>
+  <section class="mx-auto max-w-5xl px-6 py-16">
+    <div class="text-center mb-12">
+      <div class="font-display uppercase tracking-[0.4em] text-xs text-rust mb-3">
+        The Reverse Index
+      </div>
+      <h1 class="font-display font-bold uppercase text-5xl sm:text-6xl letterpress">
+        The Tater Tot Budget
+      </h1>
+      <p class="font-serif italic text-lg text-brown-warm mt-4 max-w-2xl mx-auto">
+        Submit a quantity of <BrandName /> &mdash; whether a modest snack or a
+        fortune in starch &mdash; and the Council will report what your allowance
+        affords across every entry in the Index.
+      </p>
+    </div>
+
+    <div class="card-bordered p-6 sm:p-10 mb-12">
+      <label class="block">
+        <div class="font-display uppercase tracking-[0.2em] text-xs text-brown-warm mb-2">
+          Enter a Tot Allowance
+        </div>
+        <div class="flex items-center border-2 border-brown-deep bg-cream-light">
+          <input
+            id="bud-input"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="any"
+            value="1000000"
+            class="input-paper border-0 flex-1 px-4 py-4 text-2xl sm:text-3xl tabular w-full focus:outline-none"
+            aria-label="Tot count"
+          />
+          <span class="px-4 font-display uppercase tracking-[0.18em] text-xs text-brown-warm border-l-2 border-brown-deep py-4 whitespace-nowrap">
+            <span class="brand-name">Tater Tots</span><span class="brand-generic">Taters</span>
+          </span>
+        </div>
+      </label>
+
+      <div class="mt-4">
+        <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm mb-2">
+          Or select a preset
+        </div>
+        <div class="flex flex-wrap gap-2">
+          {presets.map((p) => (
+            <button
+              type="button"
+              data-bud-preset={p.value}
+              class="bg-cream-light hover:bg-gold/40 text-brown-deep border-2 border-brown-deep font-display uppercase tracking-[0.15em] text-[11px] px-3 py-2 transition-colors"
+            >
+              {p.label}
+              <span class="text-brown-warm/70 ml-1 normal-case font-serif italic">
+                {p.value.toLocaleString()}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="rule-ornate my-10">
+        <span class="font-display uppercase tracking-[0.3em] text-[10px]">Equivalent Value</span>
+      </div>
+
+      <div class="text-center">
+        <div class="font-display uppercase tracking-[0.2em] text-xs text-brown-warm">
+          That allowance, in U.S. dollars:
+        </div>
+        <div id="bud-cost" class="font-stat text-rust-deep tabular leading-none text-6xl sm:text-7xl my-4">
+          &mdash;
+        </div>
+        <p id="bud-spatial" class="font-serif italic text-lg text-brown-warm leading-snug max-w-2xl mx-auto">
+          &mdash;
+        </p>
+      </div>
+    </div>
+
+    <!-- AFFORDABILITY MATRIX -->
+    <div class="text-center mb-8">
+      <div class="font-display uppercase tracking-[0.4em] text-xs text-rust mb-2">
+        The Council's Determination
+      </div>
+      <h2 class="font-display font-bold uppercase text-3xl sm:text-4xl letterpress">
+        What Your Allowance Affords
+      </h2>
+      <p class="font-serif italic text-brown-warm mt-2">
+        Computed against every entry in the Index.
+      </p>
+    </div>
+
+    <div class="space-y-12">
+      {grouped.map((group) => (
+        <div>
+          <div class="rule-ornate mb-6">
+            <span class="font-display uppercase tracking-[0.3em] text-xs text-brown-warm">
+              {group.label}
+            </span>
+          </div>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {group.items.map((item) => (
+              <div
+                data-affordable
+                data-name-tots={item.priceUsd / PRICE_PER_TOT.name}
+                data-generic-tots={item.priceUsd / PRICE_PER_TOT.generic}
+                data-item-name={item.name}
+                class="border-2 border-brown-deep bg-cream-light p-4 flex flex-col"
+              >
+                <div class="flex items-baseline justify-between gap-3 mb-2">
+                  <h3 class="font-display font-bold uppercase text-base text-brown-deep leading-tight">
+                    {item.name}
+                  </h3>
+                  <span class="font-serif italic text-xs text-brown-warm shrink-0 tabular">
+                    ${item.priceUsd.toLocaleString()}
+                  </span>
+                </div>
+                <div class="mt-auto pt-3 border-t border-brown-deep/20">
+                  <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
+                    You can afford
+                  </div>
+                  <div
+                    data-afford-count
+                    class="font-stat text-2xl tabular text-rust-deep leading-tight"
+                  >
+                    &mdash;
+                  </div>
+                  <div
+                    data-afford-suffix
+                    class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm"
+                  >
+                    of these
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-16 text-center">
+      <a
+        href="/calculator"
+        class="inline-block bg-brown-deep text-cream-light px-8 py-4 font-display uppercase tracking-[0.2em] text-sm hover:bg-rust-deep transition-colors border-2 border-brown-deep"
+      >
+        Forward Calculator
+      </a>
+    </div>
+  </section>
+
+  <script
+    is:inline
+    define:vars={{
+      PRICE_PER_TOT,
+    }}
+  >
+    (function () {
+      const input = document.getElementById("bud-input");
+      const elCost = document.getElementById("bud-cost");
+      const elSpatial = document.getElementById("bud-spatial");
+      const cards = document.querySelectorAll("[data-affordable]");
+
+      function fmtPrice(usd) {
+        if (!isFinite(usd) || usd < 0) return "—";
+        if (usd < 0.01) return "$" + usd.toFixed(4);
+        if (usd < 1) return "$" + usd.toFixed(2);
+        if (usd < 1000) return "$" + usd.toLocaleString("en-US", { maximumFractionDigits: 2 });
+        if (usd < 1_000_000) return "$" + Math.round(usd).toLocaleString("en-US");
+        if (usd < 1_000_000_000) {
+          const m = usd / 1_000_000;
+          return "$" + (m >= 10 ? m.toFixed(1) : m.toFixed(2)) + " million";
+        }
+        if (usd < 1_000_000_000_000) {
+          const b = usd / 1_000_000_000;
+          return "$" + (b >= 10 ? b.toFixed(1) : b.toFixed(2)) + " billion";
+        }
+        return "$" + (usd / 1_000_000_000_000).toFixed(2) + " trillion";
+      }
+
+      function fmtAfford(n) {
+        if (!isFinite(n) || n < 0) return ["—", ""];
+        if (n === 0)        return ["0",   "of these"];
+        if (n < 0.0001)     return ["<0.01%", "of one"];
+        if (n < 0.01)       return [(n * 100).toFixed(2) + "%", "of one"];
+        if (n < 1)          return [(n * 100).toFixed(1) + "%", "of one"];
+        if (n < 10)         return [n.toFixed(2), n >= 2 ? "of these" : "of one (and change)"];
+        if (n < 1000)       return [n.toFixed(1), "of these"];
+        if (n < 1_000_000)  return [Math.round(n).toLocaleString("en-US"), "of these"];
+        if (n < 1_000_000_000) {
+          const m = n / 1_000_000;
+          return [(m >= 10 ? m.toFixed(1) : m.toFixed(2)) + "M", "of these"];
+        }
+        const b = n / 1_000_000_000;
+        return [(b >= 10 ? b.toFixed(1) : b.toFixed(2)) + "B", "of these"];
+      }
+
+      function spatialFor(tots) {
+        if (tots <= 0) return "—";
+        if (tots < 50) return "A modest snack — fits comfortably in the palm of one hand.";
+        if (tots < 500) return "Enough to fill a coffee cup, generously.";
+        if (tots < 5_000) return "A heaping plate, properly garnished.";
+        if (tots < 50_000) return "A five-gallon bucket several times filled.";
+        if (tots < 500_000) return "A pantry packed wall-to-wall, overflowing into the hall.";
+        if (tots < 5_000_000) return "Burying the family vehicle in the driveway.";
+        if (tots < 50_000_000) return "A suburban lot transformed into a glittering field of cylinders.";
+        if (tots < 500_000_000) return "A small city's population, stacked in the town square.";
+        if (tots < 5_000_000_000) return "A literal mountain — visible from passing aircraft.";
+        return "Quantities of this magnitude require professional logistics support.";
+      }
+
+      function brand() {
+        return document.documentElement.dataset.brand === "generic" ? "generic" : "name";
+      }
+
+      function update() {
+        const tots = parseFloat(input.value);
+        if (!isFinite(tots) || tots < 0) {
+          elCost.textContent = "—";
+          elSpatial.textContent = "—";
+          cards.forEach((c) => {
+            c.querySelector("[data-afford-count]").textContent = "—";
+            c.querySelector("[data-afford-suffix]").textContent = "";
+          });
+          return;
+        }
+
+        const b = brand();
+        const cost = tots * PRICE_PER_TOT[b];
+        elCost.textContent = fmtPrice(cost);
+        elSpatial.textContent = spatialFor(tots);
+
+        cards.forEach((card) => {
+          const itemTots = parseFloat(
+            b === "name"
+              ? card.getAttribute("data-name-tots")
+              : card.getAttribute("data-generic-tots")
+          );
+          const ratio = tots / itemTots;
+          const [head, tail] = fmtAfford(ratio);
+          card.querySelector("[data-afford-count]").textContent = head;
+          card.querySelector("[data-afford-suffix]").textContent = tail;
+        });
+      }
+
+      input.addEventListener("input", update);
+      window.addEventListener("brandchange", update);
+      document.querySelectorAll("[data-bud-preset]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          input.value = btn.getAttribute("data-bud-preset");
+          update();
+        });
+      });
+      update();
+    })();
+  </script>
+</Layout>

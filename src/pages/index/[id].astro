@@ -1,0 +1,275 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import BrandName from "../../components/BrandName.astro";
+import ComparisonCard from "../../components/ComparisonCard.astro";
+import {
+  COMPARISONS,
+  CATEGORY_LABELS,
+} from "../../data/comparisons";
+import {
+  PRICE_PER_OUNCE,
+  PRICE_PER_TOT,
+  TOT_WEIGHT_GRAMS,
+} from "../../data/constants";
+
+export async function getStaticPaths() {
+  return COMPARISONS.map((item) => ({ params: { id: item.id }, props: { item } }));
+}
+
+const { item } = Astro.props;
+const idx = COMPARISONS.findIndex((c) => c.id === item.id);
+const prev = COMPARISONS[(idx - 1 + COMPARISONS.length) % COMPARISONS.length];
+const next = COMPARISONS[(idx + 1) % COMPARISONS.length];
+const related = COMPARISONS
+  .filter((c) => c.category === item.category && c.id !== item.id)
+  .slice(0, 3);
+
+const totsName = item.priceUsd / PRICE_PER_TOT.name;
+const totsGeneric = item.priceUsd / PRICE_PER_TOT.generic;
+
+function fmt(n: number): string {
+  if (n < 10) return n.toFixed(1);
+  if (n < 1_000_000) return Math.round(n).toLocaleString("en-US");
+  if (n < 1_000_000_000) {
+    const m = n / 1_000_000;
+    return (m >= 100 ? Math.round(m).toString() : m.toFixed(m >= 10 ? 1 : 2)) + " million";
+  }
+  if (n < 1_000_000_000_000) {
+    const b = n / 1_000_000_000;
+    return (b >= 100 ? Math.round(b).toString() : b.toFixed(b >= 10 ? 1 : 2)) + " billion";
+  }
+  return (n / 1_000_000_000_000).toFixed(2) + " trillion";
+}
+
+function fmtPrice(n: number): string {
+  if (n < 1) return `$${n.toFixed(2)}`;
+  if (n < 1_000) return `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+  if (n < 1_000_000) return `$${Math.round(n).toLocaleString("en-US")}`;
+  if (n < 1_000_000_000) {
+    const m = n / 1_000_000;
+    return `$${m >= 10 ? m.toFixed(1) : m.toFixed(2)} million`;
+  }
+  return `$${(n / 1_000_000_000).toFixed(2)} billion`;
+}
+
+function fmtWeight(grams: number): string {
+  const lbs = grams / 453.592;
+  if (lbs < 1) return `${(lbs * 16).toFixed(1)} oz`;
+  if (lbs < 2000) return `${lbs.toLocaleString("en-US", { maximumFractionDigits: 1 })} lbs`;
+  const tons = lbs / 2000;
+  return tons < 1000
+    ? `${tons.toLocaleString("en-US", { maximumFractionDigits: tons < 100 ? 1 : 0 })} tons`
+    : `${(tons / 1000).toFixed(1)}K tons`;
+}
+
+function fmtVolume(cuFt: number): string {
+  if (cuFt < 1) return `${(cuFt * 1728).toFixed(1)} cu. in.`;
+  if (cuFt < 10000) return `${cuFt.toLocaleString("en-US", { maximumFractionDigits: 1 })} cu. ft.`;
+  return `${Math.round(cuFt).toLocaleString("en-US")} cu. ft.`;
+}
+
+function fmtLength(meters: number): string {
+  if (meters < 1) return `${(meters * 100).toFixed(1)} cm`;
+  if (meters < 1000) return `${meters.toLocaleString("en-US", { maximumFractionDigits: 1 })} m`;
+  const km = meters / 1000;
+  const miles = km * 0.621371;
+  return `${km.toLocaleString("en-US", { maximumFractionDigits: 0 })} km (${miles.toLocaleString("en-US", { maximumFractionDigits: 0 })} mi)`;
+}
+
+const gramsName = totsName * TOT_WEIGHT_GRAMS;
+const cuFtName = (totsName * 10) / 28316.85;
+const lengthMName = (totsName * 25) / 1000;
+const houseDepthFt = cuFtName / 2000;
+const poolFraction = cuFtName / 2560;
+const moonFraction = lengthMName / 384_400_000;
+
+const fmtDepth = (feet: number) =>
+  feet < 1 / 12
+    ? `${(feet * 12).toFixed(2)} inches`
+    : feet < 1
+      ? `${(feet * 12).toFixed(1)} inches`
+      : feet < 100
+        ? `${feet.toFixed(1)} feet`
+        : `${Math.round(feet).toLocaleString("en-US")} feet`;
+const fmtPool = (f: number) =>
+  f < 1
+    ? `${Math.round(f * 100)}% of a pool`
+    : f < 10
+      ? `${f.toFixed(1)}× a pool`
+      : `${Math.round(f).toLocaleString("en-US")}× a pool`;
+const fmtMoon = (f: number) =>
+  f < 0.0001
+    ? `${(f * 100).toFixed(4)}% to the moon`
+    : f < 0.01
+      ? `${(f * 100).toFixed(3)}% to the moon`
+      : f < 1
+        ? `${(f * 100).toFixed(2)}% to the moon`
+        : f < 10
+          ? `${f.toFixed(2)}× lunar distance`
+          : `${Math.round(f).toLocaleString("en-US")}× lunar distance`;
+---
+<Layout
+  title={`${item.name} | The Tater Tot Index`}
+  description={`${item.name} (${fmtPrice(item.priceUsd)}) equates to ${fmt(totsName)} Tater Tots. ${item.spatial}`}
+  og={`items/${item.id}`}
+>
+  <section class="mx-auto max-w-4xl px-6 py-12">
+    <!-- Crumb -->
+    <nav class="font-display uppercase tracking-[0.25em] text-[10px] text-brown-warm mb-6 flex items-center gap-2">
+      <a href="/" class="hover:text-rust">The Index</a>
+      <span class="text-brown-warm/40">/</span>
+      <span>{CATEGORY_LABELS[item.category]}</span>
+      <span class="text-brown-warm/40">/</span>
+      <span class="text-brown-deep">{item.name}</span>
+    </nav>
+
+    <!-- Hero -->
+    <div class="card-bordered p-8 sm:p-12 text-center">
+      <div class="font-display uppercase tracking-[0.4em] text-xs text-rust mb-3">
+        Index Entry &middot; {CATEGORY_LABELS[item.category]}
+      </div>
+      <h1 class="font-display font-bold uppercase text-4xl sm:text-6xl text-brown-deep leading-[0.95] letterpress">
+        {item.name}
+      </h1>
+      <div class="font-serif italic text-base text-brown-warm mt-3 tabular">
+        Prevailing market value: <strong class="not-italic font-semibold">{fmtPrice(item.priceUsd)}</strong>
+      </div>
+
+      <div class="rule-ornate my-8">
+        <span class="font-display uppercase tracking-[0.3em] text-[10px]">Equates To</span>
+      </div>
+
+      <div>
+        <div class="font-display uppercase tracking-[0.18em] text-xs text-brown-warm">
+          <span class="brand-name">Tater Tots</span><span class="brand-generic">Taters Seasoned Shredded Potatoes</span>
+        </div>
+        <div class="font-stat text-rust-deep tabular leading-none text-7xl sm:text-8xl mt-2">
+          <span class="brand-name">{fmt(totsName)}</span><span class="brand-generic">{fmt(totsGeneric)}</span>
+        </div>
+        <div class="font-display uppercase tracking-[0.2em] text-xs text-brown-warm mt-3">
+          Crisped, Golden Cylinders
+        </div>
+      </div>
+
+      <p class="font-serif italic text-xl text-brown-deep leading-snug max-w-2xl mx-auto mt-10 border-t-2 border-b-2 border-brown-deep/20 py-6">
+        "{item.spatial}"
+      </p>
+
+      <p class="font-serif text-base text-brown-warm mt-4 max-w-xl mx-auto">
+        {item.blurb}
+      </p>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+      <div class="border-2 border-brown-deep bg-cream-light p-4 text-center">
+        <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
+          Equivalent Cost
+        </div>
+        <div class="font-stat text-2xl tabular text-brown-deep mt-1">{fmtPrice(item.priceUsd)}</div>
+      </div>
+      <div class="border-2 border-brown-deep bg-cream-light p-4 text-center">
+        <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
+          Total Weight
+        </div>
+        <div class="font-stat text-2xl tabular text-brown-deep mt-1">{fmtWeight(gramsName)}</div>
+      </div>
+      <div class="border-2 border-brown-deep bg-cream-light p-4 text-center">
+        <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
+          Total Volume
+        </div>
+        <div class="font-stat text-2xl tabular text-brown-deep mt-1">{fmtVolume(cuFtName)}</div>
+      </div>
+      <div class="border-2 border-brown-deep bg-cream-light p-4 text-center">
+        <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
+          End-to-End Length
+        </div>
+        <div class="font-stat text-2xl tabular text-brown-deep mt-1">{fmtLength(lengthMName)}</div>
+      </div>
+    </div>
+
+    <!-- Spatial trio -->
+    <div class="grid sm:grid-cols-3 gap-4 mt-4">
+      <div class="border-2 border-brown-deep p-4">
+        <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
+          Buries a 2,000 sq. ft. home
+        </div>
+        <div class="font-stat text-xl tabular text-brown-deep mt-1">{fmtDepth(houseDepthFt)} deep</div>
+      </div>
+      <div class="border-2 border-brown-deep p-4">
+        <div class="font-display uppercase tracking-[0.18em] text-[10px] text-brown-warm">
+          Floods a standard pool
+        </div>
+        <div class="font-stat text-xl tabular text-brown-deep mt-1">{fmtPool(poolFraction)}</div>
+      </div>
+      <div class="border-2 border-brown-deep p-4 bg-brown-deep text-cream-light">
+        <div class="font-display uppercase tracking-[0.18em] text-[10px] text-gold">
+          End-to-end, to the moon
+        </div>
+        <div class="font-stat text-xl tabular text-cream-light mt-1">{fmtMoon(moonFraction)}</div>
+      </div>
+    </div>
+
+    <!-- Pricing reference -->
+    <div class="mt-10 border-2 border-brown-deep bg-paper p-6 text-center">
+      <div class="font-display uppercase tracking-[0.2em] text-xs text-rust mb-2">
+        Council Methodology
+      </div>
+      <p class="font-serif text-sm text-brown-deep leading-relaxed">
+        At the prevailing rate of <strong>${PRICE_PER_OUNCE.name.toFixed(2)}/oz</strong> for name-brand
+        Tater Tots&reg; or <strong>${PRICE_PER_OUNCE.generic.toFixed(3)}/oz</strong> for the generic
+        equivalent, with each tot standardized to {TOT_WEIGHT_GRAMS} grams. The thrifty consumer is
+        directed to the <a href="/calculator" class="underline decoration-rust decoration-2">Calculator</a>
+        for additional dimensional conversions.
+      </p>
+    </div>
+
+    <!-- Related -->
+    {related.length > 0 && (
+      <div class="mt-16">
+        <div class="text-center mb-8">
+          <div class="font-display uppercase tracking-[0.3em] text-xs text-rust mb-2">
+            Related Entries
+          </div>
+          <h2 class="font-display font-bold uppercase text-2xl sm:text-3xl letterpress">
+            Other {CATEGORY_LABELS[item.category]}
+          </h2>
+        </div>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {related.map((r) => <ComparisonCard item={r} />)}
+        </div>
+      </div>
+    )}
+
+    <!-- Prev / Next -->
+    <div class="mt-16 grid sm:grid-cols-2 gap-4">
+      <a
+        href={`/index/${prev.id}`}
+        class="border-2 border-brown-deep bg-cream-light hover:bg-gold/30 p-4 transition-colors block"
+      >
+        <div class="font-display uppercase tracking-[0.2em] text-[10px] text-brown-warm">
+          &larr; Previous Entry
+        </div>
+        <div class="font-display font-bold uppercase text-base text-brown-deep mt-1">{prev.name}</div>
+      </a>
+      <a
+        href={`/index/${next.id}`}
+        class="border-2 border-brown-deep bg-cream-light hover:bg-gold/30 p-4 text-right transition-colors block"
+      >
+        <div class="font-display uppercase tracking-[0.2em] text-[10px] text-brown-warm">
+          Next Entry &rarr;
+        </div>
+        <div class="font-display font-bold uppercase text-base text-brown-deep mt-1">{next.name}</div>
+      </a>
+    </div>
+
+    <div class="mt-12 text-center">
+      <a
+        href="/"
+        class="inline-block bg-brown-deep text-cream-light px-8 py-4 font-display uppercase tracking-[0.2em] text-sm hover:bg-rust-deep transition-colors border-2 border-brown-deep"
+      >
+        &larr; Return to the Index
+      </a>
+    </div>
+  </section>
+</Layout>
